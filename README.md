@@ -10,6 +10,6 @@ Running this script will make calls to Synapse to
 
 The script can be run in Python (3.X) by using
 
-`python getAndEmailStorageReport.py -e <synapseEmail> -k <synapseApiKey> -r <recipientSynapseId> -p <parentFolder>`
+`python GenerateAndSendStorageReport.py -e <synapseEmail> -k <synapseApiKey> -r <recipientSynapseId> -p <parentFolder>`
 
 Note that the user running the script must have authorization to generate storage reports in Synapse, and the notification recipient must have permission to view the contents of the parent folder (otherwise, they will hit a 403 when following the link in the notification).
