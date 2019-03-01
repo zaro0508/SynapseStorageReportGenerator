@@ -3,7 +3,7 @@
 Running this script will make calls to Synapse to
 
 1. Generate a storage report
-2. Upload the storage report to Synapse as a file entity
+2. Upload the storage report to Synapse as new rows in a table
 3. Send a notification to a user or team containing a link to the report in Synapse
 
 ## Running the script
@@ -22,7 +22,7 @@ Where
 The table should already exist and have a schema. The schema of the table should match exactly as follows (in order):
 
 |Column Name|Column Type|Size|
-|---|---|---|----|
+|---|---|---|
 |projectId|Entity|NA|
 |projectName|String|256|
 |sizeInBytes|Integer|NA|
