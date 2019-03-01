@@ -1,15 +1,19 @@
+import os
 import sys
 import argparse
 import datetime
 import synapseclient
 import synapseutils
-from synapseclient import File, Folder
+import tempfile
+import pandas as pd
+from synapseclient import File, Folder, Table
 from time import sleep
 
 currentYear = datetime.datetime.now().isoformat()[:4]  # YYYY
-currentDate = datetime.datetime.now().isoformat()[:10] # YYYY-MM-DD
+currentDate = datetime.datetime.now().isoformat()[:10]  # YYYY-MM-DD
+currentTime = datetime.datetime.now().isoformat()[:19]
 
-def createAndSendReport(email, apiKey, recipientIds, parentFolder):
+def createAndSendReport(email, apiKey, recipientIds, tableId):
     syn = synapseclient.Synapse()
     syn.login(email=email, apiKey=apiKey)
 
@@ -27,32 +31,31 @@ def createAndSendReport(email, apiKey, recipientIds, parentFolder):
             sleepDuration = sleepDuration * 2
             status = syn.restGET("/storageReport/async/get/" + response['token'])
 
-    print("Job complete. Creating an entity in Synapse with the report file handle.")
+    print("Job complete. Uploading data to the specified table in Synapse.")
 
-    # Put the report in a folder named the current year, 'YYYY'. Create the folder if it doesn't exist.
-    childFolder = syn.findEntityId(currentYear, parent=parentFolder)
-    if (childFolder is None):
-        childFolder = Folder(currentYear, parent=parentFolder)
-        childFolder = syn.store(childFolder)
+    url = syn.restGET("/fileHandle/" + str(status['resultsFileHandleId']) + "/url?redirect=false", endpoint=syn.fileHandleEndpoint)
+    df = pd.read_csv(url)
+    # Add a date column to the csv
+    df['Date'] = pd.to_datetime(currentTime)
+    # Create a temp file and save the CSV to that file
+    fd, path = tempfile.mkstemp()
+    df.to_csv(path)
+    table = syn.get(tableId)
+    syn.store(Table(table, path))
 
-    reportName = "synapse-storage-stats_" + currentDate + ".csv"
-    report = File(path=None, name=reportName, parent=childFolder, dataFileHandleId=status['resultsFileHandleId'])
-    report = syn.store(report)
-
-    # Change the "downloadAs" name for convenience. Otherwise it will be Job-<job-id>.csv
-    synapseutils.changeFileMetaData(syn, report['id'], downloadAs=reportName, contentType="text/csv")
-    
+    os.remove(path)  # Delete temp file
     print("Sending notification to the specified recipients.")
-    syn.sendMessage(recipientIds, "Synapse Storage Report for " + currentDate, "<a href=\"https://www.synapse.org/#!Synapse:" + report['id'] + "\">Click here to view the report.</a>", contentType="text/html")
+    syn.sendMessage(recipientIds, "Synapse Storage Report for " + currentDate, "<a href=\"https://www.synapse.org/#!Synapse:" + 
+        tableId + "\">Click here to view the table with the new data.</a>", contentType="text/html")
     print("Job complete. Exiting!")
     exit(0)
-    
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--email", required=True, help="Synapse email address")
     parser.add_argument("-k", "--apiKey", required=True, help="Synapse API key")
     parser.add_argument("-r", "--recipient", required=True, help="Synapse user ID to receive the report")
-    parser.add_argument("-p", "--parentFolderId", required=True, help="The folder in Synapse where the report should be stored")
+    parser.add_argument("-t", "--tableId", required=True, help="The table in Synapse where new rows should be appended")
     args = parser.parse_args()
-    createAndSendReport(args.email, args.apiKey, [args.recipient], args.parentFolderId)
+    createAndSendReport(args.email, args.apiKey, [args.recipient], args.tableId)
