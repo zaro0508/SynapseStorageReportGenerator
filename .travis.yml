@@ -3,7 +3,7 @@ language: python
 sudo: false
 
 python:
-- 3.4
+- 3.7
 
 script: 
 - pip3 install synapseclient
