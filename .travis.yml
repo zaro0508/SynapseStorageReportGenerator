@@ -1,5 +1,10 @@
 language: python
+
 sudo: false
+
 python:
 - 3.4
-script: GenerateAndSendStorageReport.py python3 GenerateAndSendStorageReport.py -e evaluationStatistics -k ${API_KEY} -r 273960 syn18386033
+
+script: 
+- pip3 install synapseclient
+- python3 GenerateAndSendStorageReport.py python3 GenerateAndSendStorageReport.py -e {SYNAPSE_USERNAME} -k ${SYNAPSE_API_KEY} -r ${NOTIFICATION_PRINCIPAL_ID} ${TABLE_SYNAPSE_ID}
