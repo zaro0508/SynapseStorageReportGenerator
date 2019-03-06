@@ -7,4 +7,4 @@ python:
 
 script: 
 - pip3 install pandas synapseclient
-- python3 GenerateAndSendStorageReport.py python3 GenerateAndSendStorageReport.py -e {SYNAPSE_USERNAME} -k ${SYNAPSE_API_KEY} -r ${NOTIFICATION_PRINCIPAL_ID} ${TABLE_SYNAPSE_ID}
+- python3 GenerateAndSendStorageReport.py python3 GenerateAndSendStorageReport.py -e {SYNAPSE_USERNAME} -k ${SYNAPSE_API_KEY} -r ${NOTIFICATION_PRINCIPAL_ID} -t ${TABLE_SYNAPSE_ID}
