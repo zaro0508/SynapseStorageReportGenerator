@@ -46,7 +46,7 @@ def createAndSendReport(email, apiKey, recipientIds, tableId):
     os.remove(path)  # Delete temp file
     print("Sending notification to the specified recipients.")
     syn.sendMessage(recipientIds, "Synapse Storage Report for " + currentDate, "<a href=\"https://www.synapse.org/#!Synapse:" + 
-        tableId + "\">Click here to view the table with the new data.</a>", contentType="text/html")
+        tableId + "\">Click here to view the table with the new data</a>.  You can filter by date to see the report for the current period or filter by project to see how its usage has changed over time.", contentType="text/html")
     print("Job complete. Exiting!")
     exit(0)
 
