@@ -27,7 +27,7 @@ jobs:
 
       - name: Generate Storage Report
         run: |
-          python GenerateAndSendStorageReport.py -e ${{env.SYNAPSE_USERNAME}} -k ${{secrets.SYNAPSE_API_KEY}} -r ${{env.NOTIFICATION_PRINCIPAL_ID}} -t ${{env.TABLE_SYNAPSE_ID}}
+          python GenerateAndSendStorageReport.py -e ${{env.SYNAPSE_USERNAME}} -k ${{secrets.SYNAPSE_PAT} -r ${{env.NOTIFICATION_PRINCIPAL_ID}} -t ${{env.TABLE_SYNAPSE_ID}}
 
       # prevent GH action from disabling scheduled builds
       - uses: gautamkrishnar/keepalive-workflow@master

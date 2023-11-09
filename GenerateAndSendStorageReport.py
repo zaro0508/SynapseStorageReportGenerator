@@ -13,9 +13,9 @@ currentYear = datetime.datetime.now().isoformat()[:4]  # YYYY
 currentDate = datetime.datetime.now().isoformat()[:10]  # YYYY-MM-DD
 currentTime = datetime.datetime.now().isoformat()[:19]
 
-def createAndSendReport(email, apiKey, recipientIds, tableId):
+def createAndSendReport(email, token, recipientIds, tableId):
     syn = synapseclient.Synapse()
-    syn.login(email=email, apiKey=apiKey)
+    syn.login(email=email, authToken=token)
 
     print("Making call to Synapse to generate a storage report")
     response = syn.restPOST("/storageReport/async/start", body="{\n\t\"reportType\":\"ALL_PROJECTS\"\n}")
@@ -54,8 +54,8 @@ def createAndSendReport(email, apiKey, recipientIds, tableId):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--email", required=True, help="Synapse email address")
-    parser.add_argument("-k", "--apiKey", required=True, help="Synapse API key")
+    parser.add_argument("-k", "--token", required=True, help="Synapse Personal Access Token")
     parser.add_argument("-r", "--recipient", required=True, help="Synapse user ID to receive the report")
     parser.add_argument("-t", "--tableId", required=True, help="The table in Synapse where new rows should be appended")
     args = parser.parse_args()
-    createAndSendReport(args.email, args.apiKey, [args.recipient], args.tableId)
+    createAndSendReport(args.email, args.token, [args.recipient], args.tableId)
